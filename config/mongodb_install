@@ -1,0 +1,52 @@
+#!/bin/bash
+#This script helps install and configure mongodb on ubuntu
+#
+
+read "Database Data Path [default=/var/lib/mongodb]: " path
+if [ -z "$path" ]; then 
+    path="/var/lib/mongodb"
+fi
+
+curl -fsSL https://pgp.mongodb.com/server-8.0.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/mongodb-server-8.0.gpg && MONGO_VERSION=$(. /etc/os-release && curl -L repo.mongodb.org/apt/${ID}/dists/${UBUNTU_CODENAME}/mongodb-org | grep -Eo '[0-9]+\.[0-9]+' | sort -V | tail -1)
+
+# At the time of writing this script, the webpage used javascript to generate contents and curl cannot produce the right data.  Hence I hardcode the version to 8.0
+if [[ -z "$MONGO_VERSION" ]]; then  
+    MONGO_VERSION="8.0"
+fi 
+
+(. /etc/os-release && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/${ID} ${UBUNTU_CODENAME}/mongodb-org/${MONGO_VERSION} multiverse") | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGO_VERSION}.list
+sudo apt update
+sudo apt install -y mongodb-org
+
+if [[ "`mkdir -p $path 2>&1 | grep "ermission denied"`" == *"ermission denied"* ]]; then 
+    sudo mkdir -p $path
+fi
+owner=`ls -l $path | awk '{print $4}'`
+if [ "$owner" != "mongodb" ]; then
+    sudo chown mongodb:mongodb $path
+    sudo usermod -a -G $owner mongodb  #Add the group to mongodb user so it can access the $path
+fi
+sudo sed -i "s/dbPath.*/dbPath: $path/g" /etc/mongod.conf
+
+sudo systemctl restart mongod.service
+
+if [ -z "`systemctl status mongod | grep -Po "Active:[ ]+(active)"`" ]; then
+    echo "MongoDB service failed.  See log details:"
+    sudo cat /var/log/mongodb/mongod.log | grep "SERVER RESTARTED" -n | tail -n -1 | cut -f1 -d":" | xargs -I % sudo tail -n +% /var/log/mongodb/mongod.log
+    exit 1
+fi
+
+username=""
+password=""
+
+while [[ -z "$username" ]]; do
+    read -p "Enter database administrative username: " username
+done
+while [[ -z "$password" ]]; do
+    read -p "Enter database administrative password: " password
+done
+
+mongosh admin --eval "db.createUser({user: \"$username\", pwd: \"$password\", roles: [\"userAdminAnyDatabase\", \"readWriteAnyDatabase\"]})"
+sudo sed -i 's/#security/security:\n  authorization: "enabled"/g' /etc/mongod.conf
+sudo systemctl restart mongod
+

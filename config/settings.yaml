@@ -1,0 +1,9 @@
+data_collector:
+  storage:
+    client:
+      url: 'localhost:27017' 
+      db-user: 'admin'
+      db-pass: 'P@ssword1'
+      import-string: 'from pymongo import MongoClient'
+      db-name: 'collector'
+
