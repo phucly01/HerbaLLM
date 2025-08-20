@@ -19,7 +19,7 @@ class tcmbankcnDownloadCollector(Collector):
             return self.__collect_url(url, user, passwd)
 
 
-    def __collect_file(self, url):
+    def __collect_file(self, url) -> list:
         filename = re.search(rf'{self.config['key-map-regex']}', url)
         filename = filename.group(1) if filename else url[url.rindex('/')+1:]
         if not Parser.get_data_parser(category_map=self.config['parser']['categories'], filename=filename):
@@ -29,11 +29,12 @@ class tcmbankcnDownloadCollector(Collector):
             data = file.read()
             # filename = url[url.rindex('/')+1:]
             print(self.config)
-            return self.parser.parse(filename, data) 
+            if self.parser.parse(filename, data):
+                return [None]
             
-        return False
+        return [url]
     
-    def __collect_url(self, url, user:str=None, passwd:str=None):
+    def __collect_url(self, url, user:str=None, passwd:str=None) -> list:
         session = HTMLSession(verify=False)
         authurl = url
         if user and passwd:
@@ -47,6 +48,7 @@ class tcmbankcnDownloadCollector(Collector):
                 tabledata = re.sub(r',[ ]+}', '}', re.sub(r'[ ]*([a-zA-Z]+): ', r'"\1": ', f'[{found.group(1)}]'.replace("'", "\"")))
                 print(tabledata)
                 tablejson = json.loads(tabledata)
+                result = []
                 for row in tablejson:
                     filename = re.search(rf'{self.config['key-map-regex']}', row['link'])
                     filename = filename.group(1) if filename else row['link'][row['link'].rindex('/')+1:]
@@ -62,11 +64,16 @@ class tcmbankcnDownloadCollector(Collector):
                         #     for block in download.iter_content(chunk_size=8192):
                         #         if block: 
                         #             file.write(block) 
-                        self.parser.parse(filename, download.content)
+                        ret = self.parser.parse(filename, download.content)
+                        if not ret or len(set(ret)) == 1:
+                            result.append(None)
+                        else:
+                            print(f'Error parsing {row['link']}: {ret}')
+                            result.append(row['link'])
                     download.close()
-                return True
+                return result if result else [None]
         resp.close()
-        return False
+        return [url]
                             
                 
             

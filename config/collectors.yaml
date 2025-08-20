@@ -2,45 +2,45 @@
 
 
 sources:
-  - url: 'https://tcmbank.cn/Download'
-    key-map-regex: '^.*[\\/](.+?\.[^.]+)\?.*'
-    parser:
-      categories:
-      #Syntax: key-map: data type, Each data type must have a parser defined in data_collector.parsers.categories
-        - herb_all.xlsx: xlsx
-          data-selector:
-            - id-map: 'TCMBank_ID'
-              name: 'sheet1'
-        - disease_all.xlsx: xlsx
-          data-selector:
-            - id-map: 'Disease_id'
-              name: 'disease'
-        - ingredient_all.xlsx: xlsx
-          data-selector:
-            - id-map: 'Ingredient_id'
-              name: 'sheet1'
-        - gene_all.xlsx: xlsx
-          data-selector:
-            - id-map: 'Target_id'
-              name: 'gene'
-        - all_mol2.zip: archive
-    storage:
-      collections:
-      #Syntax: key-map: db collection name
-        - herb_all.xlsx: herbs
-        - disease_all.xlsx: diseases
-        - ingredient_all.xlsx: ingredients
-        - gene_all.xlsx: gene
-        - all_mol2.zip: archive
-  # - url: '/mnt/d/Download/herb_all.xlsx'
-  #   key-map-regex: '^.*[\\/](.+?\.[^.]+)$'  #extract key map from url to find a matching parser.category or storage.collection
+  # - url: 'https://tcmbank.cn/Download'
+  #   key-map-regex: '^.*[\\/](.+?\.[^.]+)\?.*'
   #   parser:
-  #     categories: 
+  #     categories:
+  #     #Syntax: key-map: data type, Each data type must have a parser defined in data_collector.parsers.categories
   #       - herb_all.xlsx: xlsx
   #         data-selector:
-  #           - id-map: 'TCMBank_ID'  #id-map is mandate, it maps to _id in the database.
-  #             name: 'sheet1'        #name is optional in some cases, for excel file it is the excel sheet (mandatory)
-              
+  #           - id-map: 'TCMBank_ID'
+  #             name: 'sheet1'
+  #       - disease_all.xlsx: xlsx
+  #         data-selector:
+  #           - id-map: 'Disease_id'
+  #             name: 'disease'
+  #       - ingredient_all.xlsx: xlsx
+  #         data-selector:
+  #           - id-map: 'Ingredient_id'
+  #             name: 'sheet1'
+  #       - gene_all.xlsx: xlsx
+  #         data-selector:
+  #           - id-map: 'Target_id'
+  #             name: 'gene'
+  #       - all_mol2.zip: archive
   #   storage:
-  #     collections: 
+  #     collections:
+  #     #Syntax: key-map: db collection name
   #       - herb_all.xlsx: herbs
+  #       - disease_all.xlsx: diseases
+  #       - ingredient_all.xlsx: ingredients
+  #       - gene_all.xlsx: gene
+  #       - all_mol2.zip: archive
+  - url: '/mnt/d/Download/herb_all.xlsx'
+    key-map-regex: '^.*[\\/](.+?\.[^.]+)$'  #extract key map from url to find a matching parser.category or storage.collection
+    parser:
+      categories: 
+        - herb_all.xlsx: xlsx
+          data-selector:
+            - id-map: 'TCMBank_ID'  #id-map is mandate, it maps to _id in the database.
+              name: 'sheet1'        #name is optional in some cases, for excel file it is the excel sheet (mandatory)
+              
+    storage:
+      collections: 
+        - herb_all.xlsx: herbs

@@ -10,6 +10,7 @@ class DataCollector:
     sources : typing.ClassVar = Config().collectors['sources']
     
     def collect(self):
+        result = []
         for source in self.sources:
             url = source["url"]
             user = source["user"] if "user" in source else None
@@ -37,5 +38,12 @@ class DataCollector:
             
             collector = collectorclass(source, parserclass, storageclass)
         
-            collector.collect(url, user, password)
+            ret = collector.collect(url, user, password)
+            print(f'Parsing {url} returns {ret}')
+            if len(set(ret)) == 1:
+                result.append(None)
+            else:
+                result.append(source)
+        print(f'Final result: {result}')
+        return result
             

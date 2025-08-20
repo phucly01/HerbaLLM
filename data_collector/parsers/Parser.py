@@ -10,7 +10,18 @@ class Parser(abc.ABC):
         self.config = config
     
     @abc.abstractmethod
-    def parse(self, data)->bool:
+    def parse(self, data)->list:
+        """Entrance function to parsing module within the data collector module.  It processes the data from the collector, and store to nosql database.
+
+        Args:
+            data: raw bytes
+
+        Raises:
+            NotImplementedError: This is raised by the base class only.  The subclass should implement this method, hence no NotImplementedError exception
+
+        Returns:
+            list: A list of returns, each element represent the result of each suburl (if applicable) within the main URL.  If it only a single URL, this returns a list of 1.  None = success, non-None = error
+        """
         raise NotImplementedError 
     
     @staticmethod

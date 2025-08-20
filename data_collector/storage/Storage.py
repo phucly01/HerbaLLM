@@ -21,12 +21,10 @@ class Storage(abc.ABC):
         if not self.db_manager:
             import_string = self.config['client']['import-string']
             self.db_manager = DBManager()
-            self.db_manager.connect(import_string, self.config, 
-                                    self.config['client']['url'], 
-                                    username=self.config['client']['db-user'],
-                                    password=self.config['client']['db-pass'],
-                                    authSource='admin',
-                                    authMechanism='SCRAM-SHA-256')
+            self.db_manager.connect(import_string, 
+                                    self.config,
+                                    **self.config['client']['kwargs']
+                                    )
     
     def get_db_name(self) -> str:
         return self.config['client']['db-name']

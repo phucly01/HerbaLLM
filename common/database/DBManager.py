@@ -15,15 +15,22 @@ class DBManager:
         return self._clients[import_string]
     
     @classmethod
-    def connect(cls, import_string:str, db_config:dict, *args, **kwargs): 
+    def connect(cls, 
+                import_string:str, 
+                db_config:dict, 
+                #Arguments after this line are the input arguments for the database client constructor.
+                **kwargs
+                ): 
         if import_string not in cls._clients:
             found = re.search(r'from (.*) import (.*)', import_string)
             msg = f'{import_string} failed'
             if found:
                 m = __import__(found.group(1), fromlist=[found.group(2)])
                 m = getattr(m, found.group(2))
-                print(m) 
-                obj = m(*args, **kwargs)
+                print(f'Connecting to database')
+                print(m)
+                print(kwargs) 
+                obj = m(**kwargs)
                 db = obj.get_database(db_config['client']['db-name'])  
                 cls._clients[import_string] = obj
                 methods = [name for name in dir(obj) if callable(getattr(obj, name))]

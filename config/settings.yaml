@@ -1,9 +1,25 @@
 data_collector:
   storage:
     client:
-      url: 'localhost:27017' 
-      db-user: 'admin'
-      db-pass: 'P@ssword1'
       import-string: 'from pymongo import MongoClient'
       db-name: 'collector'
+      kwargs: #The **kwargs part of the client constructor
+        host: 'localhost'
+        port: 27017
+        username: 'admin'
+        password: 'P@ssword1'
+        authSource: 'admin'
+        authMechanism: 'SCRAM-SHA-256'
+      
 
+rad:
+  storage:
+    client:
+      import-string: 'from qdrant_client import QdrantClient'
+      db-name: 'rag'
+      kwargs:
+        url: 'localhost' 
+        port: 6333
+        api_key: 'apikeyvalue'
+      
+    

@@ -8,7 +8,7 @@ import importlib as imp
 
 class tcmbankcnDownloadParser(Parser):
         
-    def parse(self, filename, data):
+    def parse(self, filename, data) -> list:
         if not hasattr(self, 'storage'):
             self.storage = self.storage_class(self.config, filename)
             
@@ -20,7 +20,12 @@ class tcmbankcnDownloadParser(Parser):
                 category = map[filename]
                 break
         parserclass = Parser.get_data_parser(category)
+        ret = False
         if parserclass:
             print(f'### Parsing {filename}')
-            parserclass().process(bio, map['data-selector'], self.storage)
+            try:
+                ret = parserclass().process(bio, map['data-selector'], self.storage)
+            except Exception as e:
+                print(f' Error parsing {filename}: {e}')
         bio.close()
+        return ret

@@ -6,6 +6,6 @@ class Category(abc.ABC):
     
     
     abc.abstractmethod
-    def process(self, data, data_selector:list, storage:Storage):
+    def process(self, data, data_selector:list, storage:Storage) -> bool:
         raise NotImplementedError
     

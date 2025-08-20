@@ -8,7 +8,7 @@ from data_collector.storage.Storage import Storage
 
 class ExcelParser(Category):
     
-    def process(self, bio:BytesIO, data_selector:list, storage:Storage):
+    def process(self, bio:BytesIO, data_selector:list, storage:Storage)  -> bool:
         workbook = openpyxl.load_workbook(bio)
         sheets =  workbook.sheetnames
         for sheetname in sheets:
@@ -29,3 +29,6 @@ class ExcelParser(Category):
                 row['_id'] = row.pop(selector_found['id-map'])
                 if storage.save([row]):
                     print(row)
+                else:
+                    return False
+        return True
